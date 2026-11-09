@@ -1,0 +1,103 @@
+export const ACHIEVEMENTS = [
+  {
+    id: 'first-step',
+    title: 'First Step',
+    detail: 'Complete 1 lesson',
+    metric: (snap) => ({ current: Math.min(snap.lessonsDone, 1), target: 1 }),
+    isMet: (snap) => snap.lessonsDone >= 1,
+    cta: { label: 'Find a lesson', route: { name: 'discover' } },
+  },
+  {
+    id: 'scholar',
+    title: 'Scholar',
+    detail: 'Complete 10 lessons',
+    metric: (snap) => ({ current: Math.min(snap.lessonsDone, 10), target: 10 }),
+    isMet: (snap) => snap.lessonsDone >= 10,
+    cta: { label: 'Browse paths', route: { name: 'discover' } },
+  },
+  {
+    id: 'pathfinder',
+    title: 'Pathfinder',
+    detail: 'Finish every lesson in a path',
+    metric: (snap) => ({ current: Math.min(snap.pathsDone, 1), target: 1 }),
+    isMet: (snap) => snap.pathsDone >= 1,
+    cta: { label: 'Open a path', route: { name: 'discover' } },
+  },
+  {
+    id: 'perfect',
+    title: 'Clean Sweep',
+    detail: 'Get every question right in one quiz',
+    metric: (snap) => ({ current: snap.perfectAny ? 1 : 0, target: 1 }),
+    isMet: (snap) => snap.perfectAny,
+    cta: { label: 'Try a quiz', route: { name: 'discover' } },
+  },
+  {
+    id: 'streak-3',
+    title: 'On a Roll',
+    detail: 'Learn 3 days in a row',
+    metric: (snap) => ({ current: Math.min(snap.streak, 3), target: 3 }),
+    isMet: (snap) => snap.streak >= 3,
+    cta: { label: 'Back to dashboard', route: { name: 'dashboard' } },
+  },
+  {
+    id: 'streak-7',
+    title: 'Weeklong',
+    detail: 'Learn 7 days in a row',
+    metric: (snap) => ({ current: Math.min(snap.streak, 7), target: 7 }),
+    isMet: (snap) => snap.streak >= 7,
+    cta: { label: 'Today’s sprint', route: { name: 'dashboard' } },
+  },
+  {
+    id: 'challenger',
+    title: 'Challenger',
+    detail: 'Finish a daily challenge',
+    metric: (snap) => ({ current: Math.min(snap.challengesDone, 1), target: 1 }),
+    isMet: (snap) => snap.challengesDone >= 1,
+    cta: { label: 'Open challenges', route: { name: 'challenges' } },
+  },
+  {
+    id: 'trifecta',
+    title: 'Triple Threat',
+    detail: 'Finish easy, medium, and hard challenges in one day',
+    metric: (snap) => ({ current: Math.min(snap.todayDifficultyCount, 3), target: 3 }),
+    isMet: (snap) => snap.trifectaToday,
+    cta: { label: 'Today’s set', route: { name: 'challenges' } },
+  },
+  {
+    id: 'level-5',
+    title: 'Specialist',
+    detail: 'Reach level 5',
+    metric: (snap) => ({ current: Math.min(snap.level, 5), target: 5 }),
+    isMet: (snap) => snap.level >= 5,
+    cta: { label: 'Earn XP', route: { name: 'discover' } },
+  },
+  {
+    id: 'sharp',
+    title: 'Sharp Eye',
+    detail: 'Hold 80% accuracy across at least 8 answers',
+    metric: (snap) => {
+      if (snap.accuracy == null) return { current: 0, target: 8 };
+      const answersScore = Math.min(snap.answers, 8);
+      if (snap.accuracy >= 0.8) return { current: answersScore, target: 8 };
+      return { current: Math.min(answersScore, Math.round(snap.accuracy * 8)), target: 8 };
+    },
+    isMet: (snap) => snap.accuracy != null && snap.accuracy >= 0.8 && snap.answers >= 8,
+    cta: { label: 'Practice a quiz', route: { name: 'discover' } },
+  },
+  {
+    id: 'explorer',
+    title: 'Explorer',
+    detail: 'Complete a lesson in 3 different topics',
+    metric: (snap) => ({ current: Math.min(snap.topicsTouched, 3), target: 3 }),
+    isMet: (snap) => snap.topicsTouched >= 3,
+    cta: { label: 'See all topics', route: { name: 'discover' } },
+  },
+  {
+    id: 'dedicated',
+    title: 'Dedicated',
+    detail: 'Earn 500 XP',
+    metric: (snap) => ({ current: Math.min(snap.xp, 500), target: 500 }),
+    isMet: (snap) => snap.xp >= 500,
+    cta: { label: 'Continue learning', route: { name: 'discover' } },
+  },
+];
