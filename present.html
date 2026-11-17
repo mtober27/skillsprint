@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillSprint · class presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #090a0d;
+        --panel: #12141a;
+        --line: #2a2e38;
+        --text: #f6f1ea;
+        --muted: #b3ab9f;
+        --copper: #e4a27a;
+        --paper: #f3e6d4;
+        --ink: #1c140e;
+        --good: #1d3328;
+        --bad: #3a2224;
+        --cx: 70%;
+        --cy: 18%;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        font-family: "Instrument Sans", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        overflow: hidden;
+      }
+      .glow, .grid {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+      .grid {
+        background-image:
+          linear-gradient(rgba(246, 241, 234, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(246, 241, 234, 0.04) 1px, transparent 1px);
+        background-size: 88px 88px;
+        transform: translate3d(calc(var(--px, 0) * -14px), calc(var(--py, 0) * -14px), 0);
+      }
+      .glow {
+        background:
+          radial-gradient(160px circle at var(--cx) var(--cy), rgba(255, 244, 230, 0.16), transparent 70%),
+          radial-gradient(620px circle at var(--cx) var(--cy), rgba(228, 162, 122, 0.12), transparent 64%);
+      }
+      .deck { position: relative; height: 100%; }
+      .slide {
+        display: none;
+        height: 100%;
+        padding: 7vh 8vw 12vh;
+        animation: in 0.35s ease;
+      }
+      .slide.on { display: grid; align-content: center; gap: 22px; }
+      h1 {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-weight: 400;
+        font-size: clamp(3rem, 7vw, 6.4rem);
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        margin: 0;
+        max-width: 14ch;
+      }
+      h1 em { font-style: italic; color: var(--copper); }
+      h2 {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-weight: 400;
+        font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+        line-height: 1.05;
+        margin: 0;
+        max-width: 18ch;
+      }
+      p { margin: 0; font-size: 1.2rem; line-height: 1.5; color: var(--muted); max-width: 42rem; }
+      a { color: var(--paper); }
+      .kicker {
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        color: var(--copper);
+        font-weight: 600;
+      }
+      .steps, .shop, .scores { display: grid; gap: 12px; }
+      .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .shop, .scores { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px 18px;
+        transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+        transition: transform 0.16s ease-out;
+      }
+      .panel strong { display: block; color: var(--text); font-size: 1.05rem; margin-bottom: 6px; }
+      .panel span, .panel p { color: var(--muted); font-size: 0.95rem; }
+      .big { font-family: "Instrument Serif", Georgia, serif; font-size: 2.4rem; color: var(--text); line-height: 1; }
+      .quiz { display: grid; gap: 10px; max-width: 46rem; }
+      .choice, .nav button, .check {
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        border-radius: 12px;
+      }
+      .choice {
+        text-align: left;
+        padding: 14px 16px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+      }
+      .choice.right { background: var(--good); border-color: #3d6b52; }
+      .choice.wrong { background: var(--bad); border-color: #6b3a3a; }
+      .explain { padding: 14px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); }
+      .check {
+        border: 0;
+        background: var(--paper);
+        color: var(--ink);
+        padding: 12px 16px;
+        font-weight: 600;
+        width: fit-content;
+      }
+      .bar {
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 8vw 22px;
+        z-index: 2;
+      }
+      .dots { display: flex; gap: 8px; }
+      .dots button {
+        width: 8px; height: 8px; padding: 0;
+        border-radius: 99px; border: 0;
+        background: #3a3f49;
+        cursor: pointer;
+      }
+      .dots button.on { background: var(--paper); width: 22px; }
+      .nav { display: flex; gap: 8px; }
+      .nav button {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--text);
+        padding: 8px 12px;
+      }
+      .link {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-size: clamp(1.6rem, 3vw, 2.4rem);
+        color: var(--text);
+      }
+      @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+      @media (max-width: 800px) {
+        .slide { padding: 8vh 22px 14vh; overflow: auto; }
+        .steps, .shop, .scores { grid-template-columns: 1fr; }
+        h1 { font-size: 3rem; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .slide, .panel { animation: none; transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid"></div>
+    <div class="glow"></div>
+    <div class="deck" id="deck">
+      <section class="slide on">
+        <p class="kicker">Class presentation</p>
+        <h1>Skill<em>Sprint</em></h1>
+        <p>Short lessons you can finish in one sitting. A quiz at the end. Your progress stays in the browser.</p>
+        <a class="link" href="https://mtober27.github.io/skillsprint/">mtober27.github.io/skillsprint</a>
+      </section>
+
+      <section class="slide">
+        <p class="kicker">The loop</p>
+        <h2>Watch. Answer. Then the quiz.</h2>
+        <div class="steps">
+          <article class="panel"><strong>1. Pick topics</strong><span>Business, finance, technology, science, history, communication.</span></article>
+          <article class="panel"><strong>2. Open a path</strong><span>Lessons unlock in order. Twelve paths, twenty-seven lessons.</span></article>
+          <article class="panel"><strong>3. The clip pauses</strong><span>Two checks in the video. You answer before it continues.</span></article>
+          <article class="panel"><strong>4. Take the quiz</strong><span>Feedback shows immediately, with the reason.</span></article>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="kicker">Try one from the app</p>
+        <h2>Which question belongs in a business model?</h2>
+        <div class="quiz" id="quiz">
+          <button class="choice" type="button" data-ok="0">Which typeface should the logo use?</button>
+          <button class="choice" type="button" data-ok="1">How does the organization get paid for the value it delivers?</button>
+          <button class="choice" type="button" data-ok="0">How many slides should a pitch deck contain?</button>
+          <button class="check" type="button" id="grade">Check answer</button>
+          <div class="explain" id="explain" hidden></div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="kicker">Two scores</p>
+        <h2>XP levels you up. Coins are for the shop.</h2>
+        <div class="scores">
+          <article class="panel"><p class="big">XP</p><span>Lessons, clip checks, and challenges. This is your level.</span></article>
+          <article class="panel"><p class="big">Coins</p><span>20 for a perfect lesson. 8 for any other first clear. 12 for a daily challenge. 5 more when a streak continues.</span></article>
+          <article class="panel"><p class="big">Streak</p><span>A day counts when you finish a lesson or a challenge. Practice runs do not pay coins.</span></article>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="kicker">Shop</p>
+        <h2>Three things to buy.</h2>
+        <div class="shop">
+          <article class="panel"><strong>Streak shield · 30</strong><span>Miss one day and the streak stays. You can hold two.</span></article>
+          <article class="panel"><strong>Hint · 15</strong><span>On one quiz question, a wrong answer is hidden.</span></article>
+          <article class="panel"><strong>Light · 40</strong><span>Ice or Ember changes the cursor light. Warm is free.</span></article>
+        </div>
+      </section>
+
+      <section class="slide">
+        <p class="kicker">If you open it</p>
+        <h2>Two minutes is enough to see it.</h2>
+        <div class="steps">
+          <article class="panel"><strong>Enter a name</strong><span>It shows on the board.</span></article>
+          <article class="panel"><strong>Pick two topics</strong><span>Recommendations follow those.</span></article>
+          <article class="panel"><strong>Finish one lesson</strong><span>Clip, checks, then the quiz.</span></article>
+          <article class="panel"><strong>Look at the shop</strong><span>The coin count in the corner opens it.</span></article>
+        </div>
+        <a class="link" href="https://mtober27.github.io/skillsprint/">Open SkillSprint</a>
+      </section>
+    </div>
+    <footer class="bar">
+      <div class="dots" id="dots"></div>
+      <div class="nav">
+        <button type="button" id="prev">Back</button>
+        <button type="button" id="next">Next</button>
+      </div>
+    </footer>
+    <script>
+      const slides = [...document.querySelectorAll(".slide")];
+      const dots = document.getElementById("dots");
+      let index = 0;
+      slides.forEach((_, i) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.setAttribute("aria-label", "Slide " + (i + 1));
+        button.addEventListener("click", () => show(i));
+        dots.appendChild(button);
+      });
+      function show(next) {
+        index = (next + slides.length) % slides.length;
+        slides.forEach((slide, i) => slide.classList.toggle("on", i === index));
+        [...dots.children].forEach((dot, i) => dot.classList.toggle("on", i === index));
+      }
+      document.getElementById("next").addEventListener("click", () => show(index + 1));
+      document.getElementById("prev").addEventListener("click", () => show(index - 1));
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight" || event.key === " ") { event.preventDefault(); show(index + 1); }
+        if (event.key === "ArrowLeft") show(index - 1);
+      });
+      show(0);
+
+      const choices = [...document.querySelectorAll(".choice")];
+      let picked = null;
+      choices.forEach((choice) => {
+        choice.addEventListener("click", () => {
+          picked = choice;
+          choices.forEach((item) => item.classList.remove("right", "wrong"));
+          choice.style.borderColor = "#f3e6d4";
+        });
+      });
+      document.getElementById("grade").addEventListener("click", () => {
+        const box = document.getElementById("explain");
+        if (!picked) {
+          box.hidden = false;
+          box.textContent = "Choose an answer, then check it.";
+          return;
+        }
+        const ok = picked.dataset.ok === "1";
+        choices.forEach((choice) => {
+          if (choice.dataset.ok === "1") choice.classList.add("right");
+          if (choice === picked && !ok) choice.classList.add("wrong");
+        });
+        box.hidden = false;
+        box.textContent = ok
+          ? "That’s right. A model says who the customer is, what you deliver, and how you get paid."
+          : "Not quite. Logo fonts and slide counts are separate choices. The model is about value and payment.";
+      });
+
+      const root = document.documentElement;
+      let x = innerWidth * 0.72;
+      let y = innerHeight * 0.2;
+      let tx = x;
+      let ty = y;
+      addEventListener("pointermove", (event) => { tx = event.clientX; ty = event.clientY; });
+      (function tick() {
+        x += (tx - x) * 0.14;
+        y += (ty - y) * 0.14;
+        root.style.setProperty("--cx", x + "px");
+        root.style.setProperty("--cy", y + "px");
+        root.style.setProperty("--px", (x / innerWidth - 0.5) * 2);
+        root.style.setProperty("--py", (y / innerHeight - 0.5) * 2);
+        requestAnimationFrame(tick);
+      })();
+    </script>
+  </body>
+</html>
